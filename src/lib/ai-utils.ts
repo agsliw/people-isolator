@@ -10,27 +10,66 @@ let segmentationPipeline: any = null;
 let classificationPipeline: any = null;
 let nsfwPipeline: any = null;
 
-// Initialize AI models
+// Initialize AI models with device fallback
 export const initializeModels = async () => {
   try {
     console.log('Initializing AI models...');
     
+    // Try webgpu first, fallback to wasm if not supported
+    let device: 'webgpu' | 'wasm' = 'wasm'; // Default to wasm for compatibility
+    try {
+      // Test if webgpu is available
+      if ((navigator as any).gpu) {
+        device = 'webgpu';
+      }
+    } catch {
+      device = 'wasm';
+    }
+    
+    console.log(`Using device: ${device}`);
+    
     // Initialize segmentation model for background removal
     if (!segmentationPipeline) {
-      segmentationPipeline = await pipeline(
-        'image-segmentation', 
-        'Xenova/segformer-b0-finetuned-ade-512-512',
-        { device: 'webgpu' }
-      );
+      try {
+        segmentationPipeline = await pipeline(
+          'image-segmentation', 
+          'Xenova/segformer-b0-finetuned-ade-512-512',
+          { device }
+        );
+      } catch (error) {
+        if (device === 'webgpu') {
+          console.log('WebGPU failed, falling back to WASM');
+          segmentationPipeline = await pipeline(
+            'image-segmentation', 
+            'Xenova/segformer-b0-finetuned-ade-512-512',
+            { device: 'wasm' }
+          );
+        } else {
+          throw error;
+        }
+      }
     }
 
     // Initialize classification model for people detection
     if (!classificationPipeline) {
-      classificationPipeline = await pipeline(
-        'image-classification',
-        'google/vit-base-patch16-224',
-        { device: 'webgpu' }
-      );
+      try {
+        classificationPipeline = await pipeline(
+          'image-classification',
+          'google/vit-base-patch16-224',
+          { device }
+        );
+      } catch (error) {
+        if (device === 'webgpu') {
+          console.log('WebGPU failed for classification, falling back to WASM');
+          classificationPipeline = await pipeline(
+            'image-classification',
+            'google/vit-base-patch16-224',
+            { device: 'wasm' }
+          );
+        } else {
+          throw error;
+        }
+      }
     }
 
     console.log('AI models initialized successfully');
