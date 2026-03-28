@@ -25,8 +25,8 @@ export const AuthModal = ({ children }: { children: React.ReactNode }) => {
       toast.success('Welcome back!');
       setEmail('');
       setPassword('');
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Sign in failed');
     } finally {
       setLoading(false);
     }
@@ -41,8 +41,8 @@ export const AuthModal = ({ children }: { children: React.ReactNode }) => {
       toast.success('Account created! Please check your email to verify your account.');
       setEmail('');
       setPassword('');
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Sign up failed');
     } finally {
       setLoading(false);
     }
@@ -52,8 +52,8 @@ export const AuthModal = ({ children }: { children: React.ReactNode }) => {
     setLoading(true);
     try {
       await signInWithGoogle();
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Google sign in failed');
       setLoading(false);
     }
   };

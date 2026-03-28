@@ -52,6 +52,7 @@ const removeBackground = async (imageElement: HTMLImageElement): Promise<Blob> =
     if (!ctx) throw new Error('Could not get canvas context');
     
     // Resize image if needed and draw it to canvas
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const wasResized = resizeImageIfNeeded(canvas as any, ctx as any, imageElement);
     console.log(`Image ${wasResized ? 'was' : 'was not'} resized. Final dimensions: ${canvas.width}x${canvas.height}`);
     
@@ -76,6 +77,7 @@ const removeBackground = async (imageElement: HTMLImageElement): Promise<Blob> =
     if (!outputCtx) throw new Error('Could not get output canvas context');
     
     // Draw original image
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     outputCtx.drawImage(canvas as any, 0, 0);
     
     // Apply the mask
@@ -232,7 +234,7 @@ serve(async (req) => {
       console.error('Failed to update job status:', updateError);
     }
 
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

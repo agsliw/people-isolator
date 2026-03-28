@@ -6,9 +6,10 @@ env.useBrowserCache = true;
 
 const MAX_IMAGE_DIMENSION = 1024;
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 let segmentationPipeline: any = null;
 let classificationPipeline: any = null;
-let nsfwPipeline: any = null;
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 // Initialize AI models with device fallback
 export const initializeModels = async () => {
@@ -19,6 +20,7 @@ export const initializeModels = async () => {
     let device: 'webgpu' | 'wasm' = 'wasm'; // Default to wasm for compatibility
     try {
       // Test if webgpu is available
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ((navigator as any).gpu) {
         device = 'webgpu';
       }
@@ -124,7 +126,8 @@ export const detectPeople = async (imageElement: HTMLImageElement): Promise<bool
     
     // Check if any of the top predictions relate to people
     const peopleKeywords = ['person', 'people', 'human', 'man', 'woman', 'child', 'face', 'portrait'];
-    const hasPeople = result.some((prediction: any) => 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const hasPeople = result.some((prediction: any) =>
       peopleKeywords.some(keyword => 
         prediction.label.toLowerCase().includes(keyword)
       ) && prediction.score > 0.1

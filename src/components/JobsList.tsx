@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +20,7 @@ export const JobsList = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -39,11 +39,11 @@ export const JobsList = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchJobs();
-  }, [user]);
+  }, [fetchJobs]);
 
   // Poll for status updates every 5 seconds
   useEffect(() => {
@@ -52,7 +52,7 @@ export const JobsList = () => {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [user]);
+  }, [fetchJobs]);
 
   const downloadImage = async (url: string, jobId: string) => {
     try {

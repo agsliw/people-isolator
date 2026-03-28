@@ -14,8 +14,8 @@ export const Navbar = () => {
     try {
       await signOut();
       toast.success('Signed out successfully');
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Sign out failed');
     }
   };
 
